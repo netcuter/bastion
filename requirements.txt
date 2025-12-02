@@ -1,0 +1,10 @@
+# Security Audit System Requirements
+# Python 3.7+
+
+# Core dependencies - none required for basic functionality
+# The system is designed to work with Python standard library only
+
+# Optional: For enhanced features (uncomment if needed)
+# requests>=2.31.0          # For future online vulnerability database integration
+# pyyaml>=6.0               # For YAML config file support
+# colorama>=0.4.6           # For colored terminal output

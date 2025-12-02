@@ -1,0 +1,83 @@
+name: Security Audit CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run Security Audit on Examples
+      run: |
+        python3 security_audit_cli.py --path examples --output json
+
+    - name: Test All Scanners
+      run: |
+        python3 security_audit_cli.py --path examples --scanners web,secrets,dependencies,asvs,multilang
+
+    - name: Test All Report Formats
+      run: |
+        python3 security_audit_cli.py --path examples --output json --report test_json.json
+        python3 security_audit_cli.py --path examples --output html --report test_html.html
+        python3 security_audit_cli.py --path examples --output sarif --report test_sarif.sarif
+        python3 security_audit_cli.py --path examples --output asvs-json --report test_asvs.json
+        python3 security_audit_cli.py --path examples --output asvs-html --report test_asvs.html
+
+    - name: Test ASVS Levels
+      run: |
+        python3 security_audit_cli.py --path examples --output asvs-json --asvs-level 1
+        python3 security_audit_cli.py --path examples --output asvs-json --asvs-level 2
+        python3 security_audit_cli.py --path examples --output asvs-json --asvs-level 3
+
+    - name: Upload SARIF to GitHub Security
+      if: matrix.python-version == '3.11' && github.event_name == 'push'
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: test_sarif.sarif
+        category: security-audit
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 mypy
+
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 security_audit --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 security_audit --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Type check with mypy
+      continue-on-error: true
+      run: |
+        mypy security_audit --ignore-missing-imports

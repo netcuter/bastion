@@ -1,0 +1,73 @@
+{
+  "model": "trained_models/fp_classifier_rf.pkl",
+  "test_apps": [
+    "mutillidae",
+    "vulnpy",
+    "dvpwa",
+    "dvna",
+    "vulnerableapp",
+    "webgoatnet"
+  ],
+  "results": [
+    {
+      "app": "mutillidae",
+      "total_findings": 1253,
+      "predicted_real_vulns": 662,
+      "predicted_false_positives": 591,
+      "fp_reduction_pct": 47.2,
+      "avg_confidence_fp": 0.951,
+      "avg_confidence_real": 0.977
+    },
+    {
+      "app": "vulnpy",
+      "total_findings": 222,
+      "predicted_real_vulns": 75,
+      "predicted_false_positives": 147,
+      "fp_reduction_pct": 66.2,
+      "avg_confidence_fp": 0.969,
+      "avg_confidence_real": 0.964
+    },
+    {
+      "app": "dvpwa",
+      "total_findings": 150,
+      "predicted_real_vulns": 49,
+      "predicted_false_positives": 101,
+      "fp_reduction_pct": 67.3,
+      "avg_confidence_fp": 0.957,
+      "avg_confidence_real": 0.973
+    },
+    {
+      "app": "dvna",
+      "total_findings": 55,
+      "predicted_real_vulns": 29,
+      "predicted_false_positives": 26,
+      "fp_reduction_pct": 47.3,
+      "avg_confidence_fp": 0.947,
+      "avg_confidence_real": 0.931
+    },
+    {
+      "app": "vulnerableapp",
+      "total_findings": 394,
+      "predicted_real_vulns": 174,
+      "predicted_false_positives": 220,
+      "fp_reduction_pct": 55.8,
+      "avg_confidence_fp": 0.927,
+      "avg_confidence_real": 0.982
+    },
+    {
+      "app": "webgoatnet",
+      "total_findings": 771,
+      "predicted_real_vulns": 213,
+      "predicted_false_positives": 558,
+      "fp_reduction_pct": 72.4,
+      "avg_confidence_fp": 0.966,
+      "avg_confidence_real": 0.969
+    }
+  ],
+  "aggregate": {
+    "total_findings": 2845,
+    "predicted_real_vulns": 1202,
+    "predicted_false_positives": 1643,
+    "fp_reduction_pct": 57.8
+  }
+}

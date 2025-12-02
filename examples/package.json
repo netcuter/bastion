@@ -1,0 +1,16 @@
+{
+  "name": "vulnerable-app-example",
+  "version": "1.0.0",
+  "description": "Example app with vulnerable dependencies",
+  "main": "index.js",
+  "dependencies": {
+    "express": "4.16.0",
+    "lodash": "4.17.15",
+    "axios": "0.21.0",
+    "request": "2.88.0",
+    "jquery": "*"
+  },
+  "devDependencies": {
+    "webpack": "latest"
+  }
+}

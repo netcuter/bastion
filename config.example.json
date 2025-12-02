@@ -1,0 +1,101 @@
+{
+  "scan_options": {
+    "max_file_size_mb": 10,
+    "excluded_dirs": [
+      ".git",
+      "node_modules",
+      "vendor",
+      "venv",
+      "__pycache__",
+      "build",
+      "dist",
+      ".next",
+      "target"
+    ],
+    "excluded_files": [
+      "*.min.js",
+      "*.min.css",
+      "*.map",
+      "package-lock.json",
+      "yarn.lock"
+    ],
+    "included_extensions": [
+      ".py",
+      ".js",
+      ".ts",
+      ".jsx",
+      ".tsx",
+      ".php",
+      ".java",
+      ".rb",
+      ".go",
+      ".cs",
+      ".html",
+      ".htm",
+      ".xml",
+      ".json",
+      ".yml",
+      ".yaml",
+      ".env",
+      ".config",
+      ".rs",
+      ".kt",
+      ".scala",
+      ".ex",
+      ".exs"
+    ]
+  },
+  "scanners": {
+    "web_vulnerabilities": {
+      "enabled": true,
+      "severity_threshold": "INFO",
+      "checks": {
+        "sql_injection": true,
+        "xss": true,
+        "command_injection": true,
+        "path_traversal": true,
+        "ssrf": true,
+        "xxe": true,
+        "csrf": true,
+        "insecure_deserialization": true,
+        "weak_crypto": true,
+        "hardcoded_credentials": true
+      }
+    },
+    "secrets_detector": {
+      "enabled": true,
+      "severity_threshold": "INFO",
+      "patterns": {
+        "api_keys": true,
+        "passwords": true,
+        "tokens": true,
+        "private_keys": true,
+        "connection_strings": true
+      }
+    },
+    "dependency_scanner": {
+      "enabled": true,
+      "severity_threshold": "MEDIUM",
+      "check_outdated": true
+    },
+    "config_analyzer": {
+      "enabled": true,
+      "severity_threshold": "INFO"
+    },
+    "asvs_scanner": {
+      "enabled": true,
+      "asvs_level": 1,
+      "severity_threshold": "INFO"
+    },
+    "multilanguage_scanner": {
+      "enabled": true,
+      "severity_threshold": "INFO"
+    }
+  },
+  "reporting": {
+    "output_format": "json",
+    "include_code_snippets": true,
+    "snippet_context_lines": 3,
+    "group_by": "severity"
+  }
+}

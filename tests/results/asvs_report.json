@@ -1,0 +1,229 @@
+{
+  "scan_info": {
+    "scan_date": "2025-11-15T09:27:41.469513",
+    "project_path": "/home/user/system/examples",
+    "asvs_version": "4.0",
+    "asvs_level": 1
+  },
+  "compliance_summary": {
+    "overall_compliance_percentage": 80.0,
+    "total_requirements": 35,
+    "requirements_passed": 28,
+    "requirements_failed": 8,
+    "compliance_status": "Good Compliance"
+  },
+  "category_breakdown": {
+    "V1": {
+      "category_name": "V1 Architecture",
+      "compliance_percentage": 100.0,
+      "total_requirements": 0,
+      "passed": 0,
+      "failed": 0,
+      "findings": []
+    },
+    "V2": {
+      "category_name": "V2 Authentication",
+      "compliance_percentage": 33.33,
+      "total_requirements": 3,
+      "passed": 1,
+      "failed": 2,
+      "findings": [
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "CRITICAL",
+          "title": "ASVS 2.1.7 - Weak Password Storage",
+          "description": "Weak password hashing algorithm",
+          "file_path": "/home/user/system/examples/vulnerable_code.py",
+          "line_number": 71,
+          "code_snippet": "      69 | def hash_password(password):\n      70 |     # Using MD5 for password hashing\n>>>   71 |     return hashlib.md5(password.encode()).hexdigest()\n      72 | \n      73 | ",
+          "recommendation": "ASVS 2.1.7: Use bcrypt, scrypt, Argon2, or PBKDF2 for password hashing.",
+          "cwe_id": "CWE-916",
+          "owasp_category": "ASVS V2.1"
+        },
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "CRITICAL",
+          "title": "ASVS 2.1.7 - Weak Password Storage",
+          "description": "Weak password hashing in Python",
+          "file_path": "/home/user/system/examples/vulnerable_code.py",
+          "line_number": 71,
+          "code_snippet": "      69 | def hash_password(password):\n      70 |     # Using MD5 for password hashing\n>>>   71 |     return hashlib.md5(password.encode()).hexdigest()\n      72 | \n      73 | ",
+          "recommendation": "ASVS 2.1.7: Use bcrypt, scrypt, Argon2, or PBKDF2 for password hashing.",
+          "cwe_id": "CWE-916",
+          "owasp_category": "ASVS V2.1"
+        }
+      ]
+    },
+    "V3": {
+      "category_name": "V3 Session",
+      "compliance_percentage": 100.0,
+      "total_requirements": 6,
+      "passed": 6,
+      "failed": 0,
+      "findings": []
+    },
+    "V4": {
+      "category_name": "V4 Access Control",
+      "compliance_percentage": 100.0,
+      "total_requirements": 2,
+      "passed": 2,
+      "failed": 0,
+      "findings": []
+    },
+    "V5": {
+      "category_name": "V5 Validation",
+      "compliance_percentage": 100.0,
+      "total_requirements": 5,
+      "passed": 5,
+      "failed": 0,
+      "findings": []
+    },
+    "V6": {
+      "category_name": "V6 Cryptography",
+      "compliance_percentage": 0.0,
+      "total_requirements": 1,
+      "passed": 0,
+      "failed": 1,
+      "findings": [
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "HIGH",
+          "title": "ASVS 6.2.2 - Weak Cryptographic Algorithm",
+          "description": "Weak cryptographic algorithm",
+          "file_path": "/home/user/system/examples/vulnerable_code.py",
+          "line_number": 71,
+          "code_snippet": "      69 | def hash_password(password):\n      70 |     # Using MD5 for password hashing\n>>>   71 |     return hashlib.md5(password.encode()).hexdigest()\n      72 | \n      73 | ",
+          "recommendation": "ASVS 6.2.2: Use approved cryptographic algorithms (AES-256, SHA-256, etc.).",
+          "cwe_id": "CWE-327",
+          "owasp_category": "ASVS V6.2"
+        }
+      ]
+    },
+    "V7": {
+      "category_name": "V7 Error Handling",
+      "compliance_percentage": 0.0,
+      "total_requirements": 2,
+      "passed": 0,
+      "failed": 3,
+      "findings": [
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "MEDIUM",
+          "title": "ASVS 7.4.1 - Information Disclosure via Debug Mode",
+          "description": "Debug mode enabled",
+          "file_path": "/home/user/system/examples/vulnerable_code.py",
+          "line_number": 100,
+          "code_snippet": "      98 | \n      99 | if __name__ == '__main__':\n>>>  100 |     app.run(debug=True)  # VULNERABILITY: Debug mode in production",
+          "recommendation": "ASVS 14.3.3 & 7.4.1: Disable debug mode in production environments.",
+          "cwe_id": "CWE-489",
+          "owasp_category": "ASVS V7.4"
+        },
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "MEDIUM",
+          "title": "ASVS 7.4.1 - Information Disclosure via Debug Mode",
+          "description": "Flask debug mode enabled",
+          "file_path": "/home/user/system/examples/vulnerable_code.py",
+          "line_number": 100,
+          "code_snippet": "      98 | \n      99 | if __name__ == '__main__':\n>>>  100 |     app.run(debug=True)  # VULNERABILITY: Debug mode in production",
+          "recommendation": "ASVS 14.3.3 & 7.4.1: Disable debug mode in production environments.",
+          "cwe_id": "CWE-489",
+          "owasp_category": "ASVS V7.4"
+        },
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "MEDIUM",
+          "title": "ASVS 7.4.1 - Information Disclosure via Debug Mode",
+          "description": "Django debug mode enabled",
+          "file_path": "/home/user/system/examples/vulnerable_code.py",
+          "line_number": 100,
+          "code_snippet": "      98 | \n      99 | if __name__ == '__main__':\n>>>  100 |     app.run(debug=True)  # VULNERABILITY: Debug mode in production",
+          "recommendation": "ASVS 14.3.3 & 7.4.1: Disable debug mode in production environments.",
+          "cwe_id": "CWE-489",
+          "owasp_category": "ASVS V7.4"
+        }
+      ]
+    },
+    "V8": {
+      "category_name": "V8 Data Protection",
+      "compliance_percentage": 100.0,
+      "total_requirements": 2,
+      "passed": 2,
+      "failed": 0,
+      "findings": []
+    },
+    "V9": {
+      "category_name": "V9 Communication",
+      "compliance_percentage": 100.0,
+      "total_requirements": 2,
+      "passed": 2,
+      "failed": 0,
+      "findings": []
+    },
+    "V10": {
+      "category_name": "V10 Malicious Code",
+      "compliance_percentage": 100.0,
+      "total_requirements": 0,
+      "passed": 0,
+      "failed": 0,
+      "findings": []
+    },
+    "V11": {
+      "category_name": "V11 Business Logic",
+      "compliance_percentage": 100.0,
+      "total_requirements": 0,
+      "passed": 0,
+      "failed": 0,
+      "findings": []
+    },
+    "V12": {
+      "category_name": "V12 Files",
+      "compliance_percentage": 100.0,
+      "total_requirements": 2,
+      "passed": 2,
+      "failed": 0,
+      "findings": []
+    },
+    "V13": {
+      "category_name": "V13 Api",
+      "compliance_percentage": 100.0,
+      "total_requirements": 2,
+      "passed": 2,
+      "failed": 0,
+      "findings": []
+    },
+    "V14": {
+      "category_name": "V14 Configuration",
+      "compliance_percentage": 75.0,
+      "total_requirements": 8,
+      "passed": 6,
+      "failed": 2,
+      "findings": [
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "MEDIUM",
+          "title": "ASVS 14.4.x - Missing Security Headers",
+          "description": "No security headers detected in code",
+          "file_path": "/home/user/system/examples/vulnerable_code.py",
+          "line_number": 1,
+          "code_snippet": "",
+          "recommendation": "ASVS 14.4.3-7: Implement CSP, HSTS, X-Content-Type-Options, X-Frame-Options headers.",
+          "cwe_id": "CWE-16",
+          "owasp_category": "ASVS V14.4"
+        },
+        {
+          "scanner": "ASVS Compliance Scanner",
+          "severity": "MEDIUM",
+          "title": "ASVS 14.4.x - Missing Security Headers",
+          "description": "No security headers detected in code",
+          "file_path": "/home/user/system/examples/vulnerable_code.js",
+          "line_number": 1,
+          "code_snippet": "",
+          "recommendation": "ASVS 14.4.3-7: Implement CSP, HSTS, X-Content-Type-Options, X-Frame-Options headers.",
+          "cwe_id": "CWE-16",
+          "owasp_category": "ASVS V14.4"
+        }
+      ]
+    }
+  }
+}
