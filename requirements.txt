@@ -1,5 +1,5 @@
 # Security Audit System Requirements
-# Python 3.7+
+# Python 3.8+
 
 # Core dependencies - none required for basic functionality
 # The system is designed to work with Python standard library only
@@ -8,3 +8,14 @@
 # requests>=2.31.0          # For future online vulnerability database integration
 # pyyaml>=6.0               # For YAML config file support
 # colorama>=0.4.6           # For colored terminal output
+
+# =============================================================================
+# 🆕 MCP Security Scanner (optional)
+# =============================================================================
+# Uncomment below for MCP Server security scanning capabilities
+# cisco-ai-mcp-scanner>=3.2.0   # Cisco AI Defense MCP Scanner
+# yara-python>=4.5.0            # YARA pattern matching (included with cisco scanner)
+
+# For full MCP scanning with all analyzers:
+# - Set CISCO_AI_DEFENSE_API_KEY for Cisco API analyzer
+# - Set OPENAI_API_KEY for LLM analyzer (optional)

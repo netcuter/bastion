@@ -5,7 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.5.1] - 2025-11-15 ✅ ML-Powered FP Reduction + Current State of Art
+## [3.0.0] - 2025-12-17 🆕 MCP Security Scanner
+
+### Added - AI Agent Security
+- **MCP Security Scanner** - Detect vulnerabilities in Model Context Protocol servers
+  - Tool Poisoning Attack detection (hidden malicious instructions)
+  - MCP Rug Pull detection (tool description changes after approval)
+  - Cross-Origin Escalation / Tool Shadowing detection
+  - Prompt Injection in tool descriptions
+
+### Security Engines
+- **Local YARA-like Pattern Matching** - Works offline, no API needed
+  - 15+ patterns for common poisoning techniques
+  - Privilege escalation detection (sudo, /etc/passwd, /etc/shadow)
+  - Data exfiltration patterns (curl, nc, wget)
+  - Meta-instruction injection (<|endoftext|>, [HIDDEN:])
+  
+- **Cisco AI Defense Integration** - Enterprise-grade MCP scanning
+  - YARA Analyzer
+  - API Analyzer (Cisco AI Defense)
+  - LLM-as-Judge Analyzer
+  
+- **Tool Pinning Engine** - Rug Pull prevention
+  - SHA256 hash tracking of tool descriptions
+  - Automatic detection of unauthorized changes
+  - Persistent storage of approved tool hashes
+
+### New Files
+- `security_audit/scanners/mcp_security_scanner.py` - Main MCP scanner
+- `security_audit/ai/anonymization_proxy.py` - Enhanced anonymization for MCP data
+- `docs/mcp/MCP_SECURITY_SCANNER.md` - Complete documentation
+
+### Usage
+```bash
+# Scan MCP server
+python3 -m security_audit.scanners.mcp_security_scanner --server https://mcp.example.com/mcp
+
+# Test tool description
+python3 -m security_audit.scanners.mcp_security_scanner --test-pattern "suspicious text"
+
+# Self-test
+python3 -m security_audit.scanners.mcp_security_scanner --self-test
+```
+
+### Dependencies (Optional)
+- `cisco-ai-mcp-scanner>=3.2.0` - For Cisco AI Defense integration
+- Environment: `CISCO_AI_DEFENSE_API_KEY`, `OPENAI_API_KEY` (optional)
+
+---
 
 ### Added
 - ML-based False Positive Reduction (58% FP reduction on unseen data)
