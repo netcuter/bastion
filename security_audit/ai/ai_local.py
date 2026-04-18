@@ -1,210 +1,178 @@
-#!/usr/bin/env python3
 """
-Local AI Integration
-Supports LM Studio, Ollama, and other local AI servers
+StructuredLLMClient — OpenAI-compatible local LLM client (LM Studio, Ollama).
 
-100% local - no data leaves your machine
+Replaces the old LocalAIAssistant heuristic ("contains 'true'") with
+proper JSON schema validation and retry logic.
 """
 
 import json
-from typing import Dict, Optional
+import urllib.error
+import urllib.request
+from typing import Any, Optional
 
 
-class LocalAIAssistant:
+class LLMError(Exception):
+    pass
+
+
+class StructuredLLMClient:
     """
-    Local AI assistant for security analysis
-    Works with LM Studio, Ollama, or any OpenAI-compatible local server
+    Client for any OpenAI-compatible local inference server.
+    Supports structured JSON output with schema validation and retries.
     """
-    
-    def __init__(self, server_url: str = 'http://localhost:1234', model: str = 'auto'):
-        """
-        Initialize local AI assistant
-        
-        Args:
-            server_url: URL of local AI server (LM Studio default: http://localhost:1234)
-            model: Model name or 'auto' to use server's loaded model
-        """
-        self.server_url = server_url.rstrip('/')
+
+    def __init__(self, server_url: str = "http://localhost:1234", model: str = "auto"):
+        self.server_url = server_url.rstrip("/")
         self.model = model
-        self.calls_made = 0
-        
-        # Try to import requests
-        try:
-            import requests
-            self.requests = requests
-        except ImportError:
-            raise ImportError("Please install requests: pip install requests")
-            
-    def verify_finding(self, finding: Dict) -> bool:
+        self._resolved_model: Optional[str] = None
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def complete_json(
+        self,
+        system: str,
+        user: str,
+        schema: dict,
+        max_retries: int = 3,
+    ) -> dict:
         """
-        Verify if a security finding is a real vulnerability
-        
-        Args:
-            finding: Dict with 'type', 'code', 'description', etc.
-            
-        Returns:
-            True if real vulnerability, False if false positive
+        Call the LLM and return a dict validated against *schema*.
+        Retries up to max_retries times on parse/validation failure.
+        Raises LLMError if all attempts fail.
         """
-        
-        prompt = self._build_verification_prompt(finding)
-        
-        try:
-            response = self._call_local_ai(prompt)
-            
-            # Parse response
-            answer = response.lower()
-            is_real = 'true' in answer or 'real' in answer or 'vulnerable' in answer
-            
-            self.calls_made += 1
-            return is_real
-            
-        except Exception as e:
-            print(f"⚠️  Local AI verification failed: {e}")
-            # On error, assume it's real (better safe than sorry)
-            return True
-            
-    def _build_verification_prompt(self, finding: Dict) -> str:
-        """Build prompt for vulnerability verification"""
-        
-        return f"""You are a security expert analyzing potential vulnerabilities.
+        import re
 
-Finding Type: {finding['type']}
-Severity: {finding['severity']}
-Code:
-```
-{finding['code']}
-```
+        hint = (
+            f"\n\nYou MUST respond with a single JSON object matching this schema:\n"
+            f"{json.dumps(schema, indent=2)}\n"
+            "No prose, no markdown fences — raw JSON only."
+        )
+        augmented_user = user + hint
 
-Description: {finding['description']}
+        last_exc: Exception = LLMError("no attempts made")
+        for attempt in range(max_retries):
+            try:
+                raw = self._call(system, augmented_user)
+                # Strip markdown fences if present
+                raw = re.sub(r"```(?:json)?\s*", "", raw).strip().rstrip("`").strip()
+                data = json.loads(raw)
+                self._validate(data, schema)
+                return data
+            except Exception as exc:
+                last_exc = exc
+                augmented_user = (
+                    user
+                    + hint
+                    + f"\n\nPrevious attempt failed: {exc}. Try again."
+                )
+        raise LLMError(f"complete_json failed after {max_retries} attempts: {last_exc}")
 
-Question: Is this a real security vulnerability or a false positive?
+    def complete_text(self, system: str, user: str, max_tokens: int = 1024) -> str:
+        """Plain text completion, no JSON parsing."""
+        return self._call(system, user, max_tokens=max_tokens)
 
-Consider:
-1. Is the code actually exploitable?
-2. Are there any protective measures in place?
-3. Is the context appropriate for this pattern?
-
-Answer with: TRUE (real vulnerability) or FALSE (false positive)
-Then explain your reasoning in 1-2 sentences.
-
-Format:
-VERDICT: [TRUE/FALSE]
-REASON: [your explanation]
-"""
-
-    def _call_local_ai(self, prompt: str, max_tokens: int = 500) -> str:
-        """
-        Call local AI server
-        
-        Args:
-            prompt: The prompt to send
-            max_tokens: Max tokens in response
-            
-        Returns:
-            AI response text
-        """
-        
-        url = f"{self.server_url}/v1/chat/completions"
-        
-        # Get model name if auto
-        model = self.model
-        if model == 'auto':
-            model = self._get_loaded_model()
-        
-        data = {
-            'model': model,
-            'messages': [
-                {
-                    'role': 'system',
-                    'content': 'You are a security expert specializing in vulnerability analysis.'
-                },
-                {
-                    'role': 'user',
-                    'content': prompt
-                }
-            ],
-            'max_tokens': max_tokens,
-            'temperature': 0.1  # Low temperature for consistent analysis
-        }
-        
-        try:
-            response = self.requests.post(url, json=data, timeout=60)
-            response.raise_for_status()
-            
-            result = response.json()
-            return result['choices'][0]['message']['content']
-            
-        except Exception as e:
-            raise Exception(f"Local AI call failed: {e}")
-            
-    def _get_loaded_model(self) -> str:
-        """Get the currently loaded model from local server"""
-        
-        try:
-            url = f"{self.server_url}/v1/models"
-            response = self.requests.get(url, timeout=10)
-            response.raise_for_status()
-            
-            models = response.json()
-            if models.get('data'):
-                return models['data'][0]['id']
-            else:
-                return 'local-model'
-                
-        except Exception:
-            # Fallback if models endpoint doesn't work
-            return 'local-model'
-            
     def test_connection(self) -> bool:
-        """Test if local AI server is accessible"""
-        
         try:
-            url = f"{self.server_url}/v1/models"
-            response = self.requests.get(url, timeout=5)
-            return response.status_code == 200
+            self._get_model()
+            return True
         except Exception:
             return False
-            
-    def get_stats(self) -> Dict:
-        """Get usage statistics"""
-        
-        return {
-            'calls_made': self.calls_made,
-            'server_url': self.server_url,
-            'model': self.model,
-            'total_cost': 0.0  # Local AI is free!
-        }
+
+    # ------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------
+
+    def _call(self, system: str, user: str, max_tokens: int = 1024) -> str:
+        model = self._get_model()
+        payload = json.dumps({
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.1,
+        }).encode()
+
+        req = urllib.request.Request(
+            f"{self.server_url}/v1/chat/completions",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                result = json.loads(resp.read())
+            return result["choices"][0]["message"]["content"]
+        except urllib.error.URLError as exc:
+            raise LLMError(f"Network error: {exc}") from exc
+        except (KeyError, IndexError) as exc:
+            raise LLMError(f"Unexpected response shape: {exc}") from exc
+
+    def _get_model(self) -> str:
+        if self._resolved_model:
+            return self._resolved_model
+        if self.model != "auto":
+            self._resolved_model = self.model
+            return self._resolved_model
+        try:
+            req = urllib.request.Request(f"{self.server_url}/v1/models")
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read())
+            self._resolved_model = data["data"][0]["id"]
+        except Exception:
+            self._resolved_model = "local-model"
+        return self._resolved_model
+
+    def _validate(self, data: Any, schema: dict) -> None:
+        """Minimal schema validation (required keys + type checks)."""
+        if not isinstance(data, dict):
+            raise ValueError("Response is not a JSON object")
+        for key in schema.get("required", []):
+            if key not in data:
+                raise ValueError(f"Missing required key: {key!r}")
+        props = schema.get("properties", {})
+        for key, val in data.items():
+            if key in props:
+                expected_type = props[key].get("type")
+                if expected_type == "string" and not isinstance(val, str):
+                    raise ValueError(f"Key {key!r} must be a string")
+                elif expected_type == "number" and not isinstance(val, (int, float)):
+                    raise ValueError(f"Key {key!r} must be a number")
+                elif expected_type == "array" and not isinstance(val, list):
+                    raise ValueError(f"Key {key!r} must be an array")
 
 
-# Example usage
-if __name__ == '__main__':
-    import sys
-    
-    # Default to LM Studio URL
-    server_url = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:1234'
-    
-    assistant = LocalAIAssistant(server_url=server_url)
-    
-    # Test connection
-    if assistant.test_connection():
-        print(f"✅ Connected to local AI: {server_url}")
-    else:
-        print(f"❌ Cannot connect to local AI: {server_url}")
-        print(f"   Make sure LM Studio or Ollama is running")
-        exit(1)
-        
-    # Test vulnerability verification
-    test_finding = {
-        'type': 'SQL Injection',
-        'severity': 'HIGH',
-        'code': 'cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")',
-        'description': 'F-string formatting in SQL query'
+# ---------------------------------------------------------------------------
+# Backward-compat shim — old code imported LocalAIAssistant
+# ---------------------------------------------------------------------------
+
+class LocalAIAssistant(StructuredLLMClient):
+    """Deprecated — use StructuredLLMClient directly."""
+
+    _VERIFY_SCHEMA = {
+        "type": "object",
+        "required": ["verdict", "reason"],
+        "properties": {
+            "verdict": {"type": "string"},
+            "reason": {"type": "string"},
+        },
     }
-    
-    print("\n🔍 Testing vulnerability verification...")
-    is_real = assistant.verify_finding(test_finding)
-    stats = assistant.get_stats()
-    
-    print(f"\nVerdict: {'REAL VULNERABILITY' if is_real else 'FALSE POSITIVE'}")
-    print(f"Calls made: {stats['calls_made']}")
-    print(f"Cost: $0.00 (100% local)")
+
+    def verify_finding(self, finding: dict) -> bool:
+        system = "You are a security expert specialising in vulnerability analysis."
+        user = (
+            f"Finding type: {finding.get('type')}\n"
+            f"Severity: {finding.get('severity')}\n"
+            f"Code:\n```\n{finding.get('code')}\n```\n"
+            f"Description: {finding.get('description')}\n\n"
+            "Is this a real vulnerability or a false positive? "
+            'Respond with {"verdict": "TRUE" or "FALSE", "reason": "..."}'
+        )
+        try:
+            result = self.complete_json(system, user, self._VERIFY_SCHEMA)
+            return result.get("verdict", "FALSE").upper() == "TRUE"
+        except LLMError:
+            return True  # fail-safe: treat as real
