@@ -1,309 +1,216 @@
-# System Audytu Bezpieczeństwa Kodu Aplikacji Webowych
+# Bastion — Security Audit System for Web Applications
 
-**[English](README_EN.md) | [Polski](README.md)**
+**English | [Polski](README_PL.md)**
 
-Kompleksowy system do automatycznego audytu bezpieczeństwa kodu źródłowego aplikacji webowych. Wykrywa podatności OWASP Top 10, hardcoded secrets, oraz problemy z zależnościami. **Wspiera OWASP ASVS 4.0 i wiele języków programowania.**
+Bastion is an open-source, AI-augmented SAST platform that goes further than pattern matching. It finds vulnerabilities, filters false positives with ML, validates exploitability with a two-agent loop, and captures evidence — all locally, without sending code to the cloud.
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-green.svg)
-![ASVS](https://img.shields.io/badge/ASVS-4.0-purple.svg)
-![SonarQube Level](https://img.shields.io/badge/SonarQube-Professional-orange.svg)
-![ML](https://img.shields.io/badge/ML-False%20Positive%20Reduction%2058%25-brightgreen.svg)
-![Detection](https://img.shields.io/badge/detection-35--40%20vulns%2F1K%20LOC-green.svg)
-![Data Flow](https://img.shields.io/badge/analysis-Data%20Flow%20%2B%20Call%20Graph-red.svg)
-![CWE 2024](https://img.shields.io/badge/CWE%20Top%2025-2024-red.svg)
-![SAST](https://img.shields.io/badge/SAST-Bandit%20%7C%20Semgrep%20%7C%20CodeQL-green.svg)
+![OWASP ASVS](https://img.shields.io/badge/OWASP%20ASVS-4.0-purple.svg)
+![CWE Top 25](https://img.shields.io/badge/CWE%20Top%2025-2024-red.svg)
+![ML FP Reduction](https://img.shields.io/badge/ML%20FP%20reduction-58%25-brightgreen.svg)
 ![Languages](https://img.shields.io/badge/languages-10+-orange.svg)
-![AI Engine](https://img.shields.io/badge/AI-AdvancedSecurity--Inspired-blue.svg)
-![Mobile Testing](https://img.shields.io/badge/Mobile-Android%20%7C%20iOS-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## 🚀 Funkcje
+---
 
-### ✅ NOWOŚĆ v3.0.0: AI-Powered Security Testing Engine (AdvancedSecurity-Inspired)
-**Zaawansowany silnik AI do testowania bezpieczeństwa inspirowany AdvancedSecurity AI Engine!**
+## How it's different
 
-#### 🧠 Threat Intelligence & Risk Modeling
-- **P.A.S.T.A Methodology** - Process for Attack Simulation and Threat Analysis
-- **Business Context Gathering** - integracja kontekstu biznesowego
-- **Technology Stack Detection** - automatyczna identyfikacja stosu technologicznego
-- **Attack Surface Mapping** - mapowanie powierzchni ataku
-- **7-Stage Threat Modeling** - kompletne modelowanie zagrożeń
-
-#### 📱 Mobile Testing Engine
-- **AI-Monkey Tester** - inteligentne testowanie aplikacji mobilnych
-- **Android & iOS Support** - pełne wsparcie dla obu platform
-- **SSL Pinning Bypass** - omijanie pinowania certyfikatów
-- **Traffic Interception** - przechwytywanie i modyfikacja ruchu
-- **Multi-Stack Instrumentation** - Java, Objective-C/Swift, C/C++, Flutter
-- **Complex Flow Navigation** - nawigacja przez złożone przepływy (checkout, logowanie, CAPTCHA)
-
-#### 🛠️ Advanced Tooling Layer
-- **Intelligent Web Crawler** - inteligentny spider dla aplikacji webowych
-- **Smart Fuzzing Engine** - zaawansowane fuzzing z wieloma strategiami
-  - Random, Mutation, Generation, Smart (AI-guided)
-  - SQL Injection, XSS, Command Injection payloads
-- **Taint Analysis Engine** - śledzenie przepływu danych
-- **Custom Tool Integration** - integracja z zewnętrznymi narzędziami
-
-#### ✔️ Adversarial Vulnerability Validation
-- **Adversarial Validation Loops** - walidacja przez kontrargumentację
-- **False Positive Reduction** - zaawansowana redukcja fałszywych alarmów
-- **Multi-Perspective Analysis** - analiza z wielu perspektyw
-- **Confidence Scoring** - scoring pewności (Confirmed, Likely, Possible, Unlikely, FP)
-- **Context-Aware Validation** - walidacja uwzględniająca kontekst kodu
-
-#### 📸 Evidence Capture System
-- **HTTP Request/Response Capture** - pełne przechwytywanie komunikacji HTTP
-- **Screenshots & Video Recording** - zrzuty ekranu i nagrania wideo
-- **UI Interaction Traces** - śledzenie interakcji z UI
-- **Instrumentation Logs** - logi z instrumentacji runtime
-- **Exploitation PoC Evidence** - dowody proof-of-concept
-- **Reproducibility Guides** - automatyczne generowanie przewodników reprodukcji
-
-#### 💼 Business Context Risk Assessment
-- **Industry-Specific Risk Analysis** - analiza ryzyka dla konkretnej branży
-- **Compliance Framework Mapping** - mapowanie na frameworki compliance (GDPR, HIPAA, PCI-DSS, SOC2)
-- **Financial Impact Estimation** - szacowanie wpływu finansowego
-- **Asset Criticality Assessment** - ocena krytyczności zasobów
-- **Executive Summary Reports** - raporty dla kadry zarządzającej
-- **Regulatory Impact Analysis** - analiza wpływu regulacyjnego
+| Capability | Semgrep OSS | SonarQube Community | **Bastion** |
+|---|---|---|---|
+| OWASP Top 10 + CWE Top 25 | ✅ | ✅ | ✅ |
+| Framework-aware rules (Django, Express, Spring…) | Partial | Partial | ✅ 9 frameworks |
+| Taint tracking / data flow | ✅ | ✅ | ✅ |
+| ML false positive reduction | ❌ | ❌ | ✅ 58% FP↓ (validated) |
+| Reachability analysis (live entrypoints) | ❌ | ❌ | ✅ v3.1 |
+| Exploitability validation (agentic loop) | ❌ | ❌ | ✅ v3.1 |
+| Agent safety guardrails (HITL, action ledger) | ❌ | ❌ | ✅ v3.1 |
+| MCP server security scanning | ❌ | ❌ | ✅ v3.0 |
+| IaC scanning (Terraform / K8s / Dockerfile) | Partial | ❌ | ✅ v3.1 |
+| LLM / prompt-injection red-team | ❌ | ❌ | ✅ v3.1 |
+| SBOM (CycloneDX 1.6) + VEX + EPSS | ❌ | ❌ | ✅ v3.1 |
+| 100% local — no cloud required | ✅ | ✅ | ✅ |
+| SARIF output (GitHub Security, GitLab, Azure) | ✅ | ✅ | ✅ |
 
 ---
 
-### ✅ NOWOŚĆ v2.5.1: ML-Powered False Positive Reduction
-**Machine Learning model redukuje false positives o 58% - 2.3x lepiej niż SonarQube!**
+## Architecture
 
-#### 🤖 Cross-Language ML Model
-- ✅ **58% FP Reduction** na unseen data (validated)
-- ✅ **5 języków**: PHP (47%), Python (67%), Node.js (47%), Java (56%), .NET (72%)
-- ✅ **100% Local** - bez cloud, bez LM Studio, działa offline!
-- ✅ **Random Forest** - 100 trees, 37 features, sklearn-based
-- ✅ **2.3x lepszy** niż SonarQube (25% FP reduction)
-- ✅ **Production Ready** - zwalidowany na 15 vulnerable apps
-
-**Przykład:**
-```bash
-# Bez ML: 1000 findings
-python3 security_audit_cli.py --path /project
-
-# Z ML: ~420 findings (58% FP reduction!)
-python3 security_audit_cli.py --path /project --fp-reduction ml
+```
+                       ┌─────────────────────────────────────────────────┐
+                       │                   bastion                        │
+                       │                                                   │
+  source code ──────>  │  SAST scanners ──> Reachability ──> Exploit     │ ──> SARIF / HTML / SBOM
+  MCP configs ──────>  │  (9 languages,     analysis         Validator   │     / CycloneDX VEX
+  IaC files ────────>  │  10+ frameworks)   (live routes)   (2-agent     │
+                       │                                     loop)        │
+                       │         ML FP filter (58% reduction)             │
+                       │         Agent Guardrails (HITL, rate-limit)      │
+                       └─────────────────────────────────────────────────┘
 ```
 
-📚 **[Pełna dokumentacja ML](docs/ml/)** | **[Quick Start](docs/ml/ML_CROSS_LANGUAGE_FINAL_SUMMARY.md)**
-
 ---
 
-### ✅ v2.4.0: Current State of Art Professional Level
-**Zaawansowana analiza z Data Flow, Call Graph i Framework-Aware detection!**
+## Features
 
-#### Data Flow Analysis Engine
-- **Taint Tracking** - śledzi tainted data od źródła do ujścia
-- **Call Graph Analysis** - mapuje wywołania funkcji w całym kodzie
-- **Interprocedural Analysis** - wykrywa podatności rozłożone na wiele funkcji
-- **Context-Aware Detection** - rozpoznaje sanityzację, redukuje false positives o 50%
+### SAST — Static Analysis
 
-#### Framework-Specific Intelligence
-- **Django** - rozróżnia `.filter()` (safe) vs `.raw()` (unsafe)
-- **Express.js** - wykrywa NoSQL injection, prototype pollution, CORS issues
-- **React** - `dangerouslySetInnerHTML`, localStorage security
-- **Spring** - missing `@PreAuthorize`, JPA injection
-- **Laravel** - `DB::raw()`, Blade escaping, mass assignment
+**OWASP Top 10 (CWE-mapped):**
+- SQL Injection (CWE-89), XSS (CWE-79), Command Injection (CWE-78)
+- Path Traversal (CWE-22), SSRF (CWE-918), XXE (CWE-611)
+- CSRF (CWE-352), Insecure Deserialization (CWE-502)
+- Weak Cryptography (CWE-327), Hardcoded Credentials (CWE-798)
 
-#### Advanced Patterns Scanner
-- **ReDoS** - catastrophic backtracking detection
-- **TOCTOU** - race conditions w file operations
-- **Prototype Pollution** - Object.assign, spread operator
-- **Second-Order Injection** - stored XSS, delayed SQLi
-- **Memory Leaks** - setInterval, addEventListener bez cleanup
+**CWE Top 25 2024 extensions:**
+- IDOR / Broken Access Control (CWE-863), SSTI (CWE-94), JWT issues (CWE-347)
+- ReDoS (CWE-1333), Prototype Pollution (CWE-1321), LDAP Injection (CWE-90)
+- Race Conditions / TOCTOU, Integer Overflow (CWE-190), File Upload (CWE-434)
 
-### Wykrywanie Podatności Webowych
-**Klasyczne OWASP Top 10:**
-- **SQL Injection** (CWE-89) - wykrywa niebezpieczne konkatenacje SQL
-- **XSS** (CWE-79) - identyfikuje niebezpieczne renderowanie danych
-- **Command Injection** (CWE-78) - wykrywa wykonywanie poleceń z user input
-- **Path Traversal** (CWE-22) - identyfikuje zagrożenia traversal ścieżek
-- **SSRF** (CWE-918) - wykrywa podatności Server-Side Request Forgery
-- **XXE** (CWE-611) - identyfikuje problemy z XML parsers
-- **CSRF** (CWE-352) - sprawdza ochronę przed atakami CSRF
-- **Insecure Deserialization** (CWE-502) - wykrywa niebezpieczną deserializację
-- **Weak Cryptography** (CWE-327) - identyfikuje słabe algorytmy kryptograficzne
-- **Hardcoded Credentials** (CWE-798) - wykrywa hardcoded hasła i klucze
+**Framework-specific intelligence:**
+- **Django** — ORM safe vs. unsafe methods, `mark_safe()`, `@csrf_exempt`
+- **Express.js** — NoSQL injection, prototype pollution, CORS misconfigs
+- **React** — `dangerouslySetInnerHTML`, localStorage secrets
+- **Spring** — missing `@PreAuthorize`, JPA injection
+- **Laravel** — `DB::raw()`, Blade escaping, mass assignment
+- **FastAPI, NestJS, Rails, Flask** — framework-aware patterns
 
-**🆕 CWE Top 25 2024 - Nowe Wzorce:**
-- **Code Injection** (CWE-94) - wykrywa eval(), exec() z user input
-- **Clickjacking** (CWE-1021) - brak nagłówków X-Frame-Options
-- **Improper Authorization / IDOR** (CWE-863) - nieprawidłowa autoryzacja dostępu
-- **Information Disclosure** (CWE-200) - wyciek wrażliwych informacji
-- **Resource Exhaustion / DoS** (CWE-400) - ataki wyczerpania zasobów
-- **Mass Assignment** (CWE-915) - przypisywanie masowe bez filtrowania
-- **JWT Security Issues** (CWE-347) - słabe klucze, brak weryfikacji
-- **Improper Privilege Management** (CWE-269) - błędy zarządzania uprawnieniami
-- **Open Redirect** (CWE-601) - przekierowania na zewnętrzne URL
-- **Server-Side Template Injection** (CWE-94) - SSTI w silnikach szablonów
+### ML False Positive Reduction
 
-**🔬 Wzorce z Professional SAST Tools (2025):**
-- **HTTP Request Timeout** (Bandit B113) - wykrywa requests bez timeout
-- **Archive Extraction** (Bandit B202) - niebezpieczne extractall()
-- **Jinja2 Security** (Bandit B701) - autoescape=False w templates
-- **TOCTOU Race Conditions** (CVE-2025) - check-then-use patterns
-- **ReDoS** (CWE-1333) - catastrophic backtracking w regex
-- **Integer Overflow** (CWE-190) - nieprawidłowa konwersja int()
-- **File Upload** (CWE-434) - brak walidacji plików
-- **Advanced Crypto** (Bandit) - DES, RC4, ECB mode, słaby random
-- **Advanced SQL/NoSQL** (Semgrep) - zaawansowane wzorce injection
-- **LDAP Injection** (CWE-90) - podatności LDAP search
-- **Prototype Pollution** (CWE-1321) - JavaScript Object.assign
+Random Forest classifier trained on 9 real-world vulnerable applications (5 languages):
 
-### Wykrywanie Sekretów
-- AWS Access Keys & Secret Keys
-- GitHub Tokens (PAT, OAuth)
-- Google API Keys
-- Slack Tokens & Webhooks
-- Stripe API Keys
-- Database Connection Strings (PostgreSQL, MySQL, MongoDB)
-- Private Keys (RSA, SSH, PGP)
-- JWT Tokens
-- SendGrid, Twilio, MailChimp API Keys
-- Generic API keys, passwords, tokens
+| Language | FP Reduction |
+|---|---|
+| .NET | 72.4% |
+| Python | 66.7% |
+| Java | 55.8% |
+| Node.js | 47.3% |
+| PHP | 47.2% |
+| **Overall** | **57.8%** |
 
-### Analiza Zależności
-- Wykrywanie znanych podatności w pakietach NPM, Python, PHP
-- Identyfikacja nieprzypietych wersji (wildcards)
-- Ostrzeżenia o przestarzałych bibliotekach
+> 2.3× better than SonarQube's 25% FP reduction. Runs 100% locally — no API calls.
 
-### Raportowanie
-- **JSON** - strukturyzowany format dla automatyzacji
-- **HTML** - wizualny raport z podświetleniem kodu
-- **SARIF** - standard dla integracji z GitHub, GitLab, Azure DevOps
-- **ASVS JSON/HTML** - raporty zgodności z OWASP ASVS 4.0
+### Reachability Analysis (v3.1)
 
-### 🌍 Wsparcie Wielu Języków i Frameworków
-- **Python** (Django, Flask)
-- **JavaScript/TypeScript** (Node.js, Express, React, Vue, Angular)
-- **PHP** (Laravel, Symfony)
-- **Java** (Spring, Jakarta EE)
-- **Ruby** (Ruby on Rails)
-- **Go** (Gin, Echo)
-- **C#** (ASP.NET, .NET Core)
-- **Rust** (Actix, Rocket)
-- **Kotlin** (Spring Boot)
-- **Scala** (Play Framework)
-- **Elixir** (Phoenix)
+For every finding, Bastion answers: *"Can user input actually reach this sink?"*
 
-### 📋 OWASP ASVS 4.0 Compliance
-System implementuje weryfikację zgodności z **Application Security Verification Standard (ASVS) 4.0**:
-- **Level 1** - Opportunistic (podstawowa weryfikacja)
-- **Level 2** - Standard (standardowa weryfikacja dla większości aplikacji)
-- **Level 3** - Advanced (zaawansowana weryfikacja dla krytycznych aplikacji)
+- Detects live HTTP entrypoints: Flask routes, Django `urlpatterns`, FastAPI decorators, Express `app.get/post`, Spring `@RequestMapping`, Laravel `Route::`, Celery tasks
+- BFS through the existing call graph → `REACHABLE` / `UNREACHABLE` / `UNKNOWN`
+- Unreachable findings grouped separately in reports — not hidden, but de-prioritised
 
-Pokrywa wszystkie kategorie ASVS:
-- V2: Authentication
-- V3: Session Management
-- V4: Access Control
-- V5: Validation, Sanitization and Encoding
-- V6: Stored Cryptography
-- V7: Error Handling and Logging
-- V8: Data Protection
-- V9: Communication
-- V10-V14: i więcej...
+### Agentic Exploitability Validator (v3.1)
 
-### 🆕 NOWOŚĆ v3.0.0: MCP Security Scanner
+Two-agent loop mirrors [Terra Security's Ambient Agent pattern](https://www.terra.security):
 
-**Skanowanie bezpieczeństwa AI Agent MCP Servers!**
+```
+Static Finding ──> Reachability filter ──> Orchestrator
+                                               │
+                         ┌─────────────────────┼─────────────────────┐
+                         ▼                     ▼                     ▼
+                   Attacker Agent         Sandbox              Judge Agent
+                   (crafts PoC)      (executes safely)    (rules verdict)
+                         │                                            │
+                         └──────────── Guardrails (every action) ────┘
+```
 
-- **Tool Poisoning Detection** - wykrywa ukryte złośliwe instrukcje w tool descriptions
-- **MCP Rug Pull Prevention** - wykrywa zmiany w toolach po zatwierdzeniu
-- **Cross-Origin Escalation** - wykrywa tool shadowing attacks
-- **Prompt Injection** - wykrywa prompt injection w opisach narzędzi
+- **Attacker Agent** — LLM generates minimal PoC, outputs structured JSON
+- **Sandbox** — subprocess with 30s timeout, localhost-only network
+- **Judge Agent** — separate context, sees only raw output (no attacker reasoning)
+- **Verdict:** `CONFIRMED` / `REFUTED` / `INDETERMINATE` with confidence score + evidence
+
+### Agent Guardrails (v3.1)
+
+Every autonomous action passes through `GuardrailsEngine`:
+
+- **Scope allowlist/denylist** — glob patterns (e.g., block `*.gov`, `prod.*`)
+- **Rate limiting** — per-minute and per-target limits
+- **Risk tiers** — `READ_ONLY` / `NETWORK_SAFE` auto-approved; `NETWORK_WRITE` / `EXPLOIT` require human approval
+- **Dry-run mode** — simulate without executing (default: on)
+- **Action ledger** — append-only JSONL audit trail of every agent action
+
+### MCP Security Scanner (v3.0)
+
+Scans Model Context Protocol servers and config files for AI agent attack patterns:
+
+- **Tool Poisoning** — detects hidden malicious instructions in tool descriptions
+- **Rug Pull Detection** — SHA256 hash tracking; alerts if tool descriptions change after approval
+- **Prompt Injection** — YARA-like patterns for privilege escalation, data exfiltration, meta-instructions
+- **Static scan** — detects `mcp.json` / `claude_desktop_config.json` in project tree automatically
+- **Optional:** Cisco AI Defense API + LLM-as-judge analyzer
 
 ```bash
-# Skanuj MCP server
+# Scan MCP server
 python3 -m security_audit.scanners.mcp_security_scanner --server https://mcp.example.com/mcp
 
-# Test tool description
-python3 -m security_audit.scanners.mcp_security_scanner --test-pattern "suspicious..."
+# Test a tool description
+python3 -m security_audit.scanners.mcp_security_scanner --test-pattern "suspicious text..."
 ```
 
-📚 **[Pełna dokumentacja MCP](docs/mcp/MCP_SECURITY_SCANNER.md)**
+### IaC Scanner (v3.1)
+
+Covers the cloud attack surface Bastion previously lacked:
+
+**Terraform:** S3 public ACL, security group `0.0.0.0/0` on SSH/RDP, wildcard IAM policies, public RDS instances, hardcoded credentials  
+**Kubernetes:** `privileged: true`, `hostNetwork`, root containers, `hostPath` mounts, missing resource limits, dangerous capabilities  
+**Dockerfile:** `USER root`, `latest` tag in `FROM`, `ADD` over HTTP, `curl|bash` patterns
+
+### LLM / Prompt-Injection Red-Team Scanner (v3.1)
+
+**Static mode** — scans source code for:
+- Unsanitized `{user_input}` in system prompts (OpenAI, Anthropic, LangChain, Ollama)
+- Tool-call handlers without action allowlists
+
+**Dynamic mode** — sends ~50 curated payloads to a live LLM endpoint:
+- Prompt injection, jailbreak primitives, tool-call poisoning, output-boundary escape
+- All requests gated through Guardrails with `EXPLOIT` risk tier
+
+### SBOM + VEX + EPSS (v3.1, CycloneDX 1.6)
+
+- Emits **CycloneDX 1.6 JSON** SBOMs for every scanned project
+- Cross-checks against **OSV.dev** (real-time CVE data) with 24h local cache
+- Enriches each CVE with **EPSS score** (probability of exploitation in the wild)
+- Outputs **VEX statements** (affected / not_affected / fixed / under_investigation)
+
+### Secrets Detection
+
+AWS keys, GitHub tokens, Google API keys, Slack, Stripe, Twilio, SendGrid, JWT tokens, RSA/SSH/PGP private keys, PostgreSQL/MySQL/MongoDB connection strings, and generic API key patterns.
+
+### OWASP ASVS 4.0 Compliance
+
+Full verification across V2–V14 at Level 1, 2, and 3.
 
 ---
 
-## 📦 Instalacja
+## Quick Start
 
 ```bash
-# Klonowanie repozytorium
-git clone https://github.com/yourusername/security-audit-system.git
-cd security-audit-system
+git clone https://github.com/netcuter/bastion.git
+cd bastion
+pip install -r requirements.txt   # optional — core works on stdlib only
 
-# Opcjonalna instalacja zależności (system działa na czystym Pythonie 3.8+)
-pip install -r requirements.txt
-```
+# Basic scan
+python3 security_audit_cli.py --path /path/to/project
 
-## 🎯 Szybki Start
+# With ML false-positive reduction
+python3 security_audit_cli.py --path . --ml-fp-reduction
 
-```bash
-# Skanowanie bieżącego katalogu (wszystkie skanery)
-python3 security_audit_cli.py --path .
-
-# Skanowanie z raportem HTML
-python3 security_audit_cli.py --path . --output html --report report.html
-
-# Raport zgodności ASVS Level 2
+# ASVS Level 2 compliance report
 python3 security_audit_cli.py --path . --output asvs-html --asvs-level 2
 
-# Skanowanie tylko określonych typów
-python3 security_audit_cli.py --path . --scanners web,secrets,asvs,multilang
+# Full agentic pipeline (requires local LLM server + target URL)
+python3 security_audit_cli.py \
+  --path /path/to/code \
+  --target-url http://localhost:5000 \
+  --validate-exploits \
+  --dast \
+  --evidence-dir ./evidence/
 
-# Skanowanie z fail na critical issues (CI/CD)
-python3 security_audit_cli.py --path . --fail-on critical
+# Fail CI on HIGH+ findings (SARIF output for GitHub Security)
+python3 security_audit_cli.py --path . --output sarif --report security.sarif --fail-on high
 ```
 
-## 📖 Dokumentacja
+---
 
-- [Przewodnik Użytkowania](USAGE_GUIDE.md) - szczegółowa dokumentacja
-- [README Security Audit](security_audit/README.md) - szczegóły techniczne
-
-## 🔍 Przykład Użycia
-
-```bash
-$ python3 security_audit_cli.py --path examples --output html
-
-╔═══════════════════════════════════════════════════════════════╗
-║                                                               ║
-║         Security Audit System for Web Applications           ║
-║                         Version 1.0.0                         ║
-║                                                               ║
-╚═══════════════════════════════════════════════════════════════╝
-
-[*] Starting security audit of: /home/user/system/examples
-[*] Registered scanners: 3
-[!] Found 11 issue(s) in examples/vulnerable_code.py
-[!] Found 14 issue(s) in examples/vulnerable_code.js
-[!] Found 3 issue(s) in examples/package.json
-
-[+] Scan completed in 0.02 seconds
-[+] Files scanned: 3
-[+] Total findings: 28
-
-================================================================================
-SCAN SUMMARY
-================================================================================
-Files scanned:     3
-Lines scanned:     220
-Scan duration:     0.02 seconds
-
-Findings by severity:
-  CRITICAL:        10
-  HIGH:            6
-  MEDIUM:          11
-  LOW:             1
-  INFO:            0
-================================================================================
-```
-
-## 🛠️ Integracja CI/CD
+## CI/CD Integration
 
 ### GitHub Actions
 
@@ -315,12 +222,11 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Run Security Audit
-        run: |
-          python3 security_audit_cli.py --path . --output sarif --report security.sarif --fail-on high
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v2
+      - uses: actions/checkout@v3
+      - name: Run Bastion
+        run: python3 security_audit_cli.py --path . --output sarif --report security.sarif --fail-on high
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: security.sarif
 ```
@@ -337,143 +243,59 @@ security_audit:
       sast: security.sarif
 ```
 
-## 🎨 Wspierane Języki i Rozszerzenia
+---
 
-- **Python** (.py) - Django, Flask, FastAPI
-- **JavaScript/TypeScript** (.js, .ts, .jsx, .tsx) - Node.js, React, Vue, Angular
-- **PHP** (.php) - Laravel, Symfony
-- **Java** (.java) - Spring, Jakarta EE
-- **Ruby** (.rb) - Ruby on Rails
-- **Go** (.go) - Gin, Echo, Fiber
-- **C#** (.cs) - ASP.NET, .NET Core
-- **Rust** (.rs) - Actix, Rocket
-- **Kotlin** (.kt) - Spring Boot, Ktor
-- **Scala** (.scala) - Play Framework, Akka
-- **Elixir** (.ex, .exs) - Phoenix
-- **HTML/XML** (.html, .htm, .xml)
-- **Config Files** (.yml, .yaml, .json, .env)
+## Report Formats
 
-## 📊 Formaty Raportów
+| Format | Use case |
+|---|---|
+| `json` | Automation, API consumers |
+| `html` | Interactive human review |
+| `sarif` | GitHub Security, GitLab, Azure DevOps, SonarQube |
+| `asvs-json` / `asvs-html` | OWASP ASVS 4.0 compliance audit |
+| `cyclonedx` | SBOM for supply-chain / procurement |
+| `vex` | VEX statements for triaged vulnerabilities |
 
-### JSON Report
-Strukturyzowany format idealny dla automatyzacji i integracji z innymi narzędziami.
+---
 
-### HTML Report
-Wizualny, interaktywny raport z:
-- Kolorowym podświetleniem według wagi
-- Snippetami kodu z kontekstem
-- Rekomendacjami naprawy
-- Statystykami i podsumowaniem
+## Supported Languages & Frameworks
 
-### SARIF Report
-Standard OASIS dla wyników statycznej analizy - integracja z:
-- GitHub Security
-- Azure DevOps
-- GitLab Security Dashboard
-- SonarQube
+Python (Django, Flask, FastAPI) · JavaScript/TypeScript (Node.js, Express, React, Vue, Angular, NestJS) · PHP (Laravel, Symfony) · Java (Spring, Jakarta EE) · Ruby (Rails) · Go (Gin, Echo, Fiber) · C# (ASP.NET, .NET Core) · Rust (Actix, Rocket) · Kotlin (Spring Boot, Ktor) · Scala (Play, Akka) · Elixir (Phoenix)
 
-## ⚙️ Konfiguracja
+IaC: Terraform · Kubernetes · Dockerfile · Docker Compose
 
-Stwórz `config.json` aby dostosować skanowanie:
+---
+
+## Configuration
 
 ```json
 {
   "scan_options": {
     "max_file_size_mb": 10,
-    "excluded_dirs": [".git", "node_modules", "venv"],
-    "included_extensions": [".py", ".js", ".php"]
+    "excluded_dirs": [".git", "node_modules", "venv"]
   },
   "scanners": {
-    "web_vulnerabilities": {
-      "enabled": true,
-      "checks": {
-        "sql_injection": true,
-        "xss": true,
-        "command_injection": true
-      }
-    },
-    "secrets_detector": {
-      "enabled": true
-    },
-    "dependency_scanner": {
-      "enabled": true,
-      "severity_threshold": "MEDIUM"
-    }
+    "web_vulnerabilities": { "enabled": true },
+    "secrets_detector": { "enabled": true },
+    "dependency_scanner": { "enabled": true, "severity_threshold": "MEDIUM" },
+    "mcp": { "enabled": true }
   }
 }
 ```
 
-Użyj: `python3 security_audit_cli.py --path . --config config.json`
-
-## 🏗️ Architektura
-
-```
-security-audit-system/
-├── security_audit/
-│   ├── core/
-│   │   ├── engine.py          # Główny silnik audytu
-│   │   ├── scanner.py         # Interfejs bazowy
-│   │   └── config.py          # System konfiguracji
-│   ├── scanners/
-│   │   ├── web_vulnerabilities.py
-│   │   ├── secrets_detector.py
-│   │   └── dependency_scanner.py
-│   └── reporters/
-│       ├── json_reporter.py
-│       ├── html_reporter.py
-│       └── sarif_reporter.py
-├── security_audit_cli.py      # CLI interface
-└── examples/                   # Przykładowy podatny kod
-```
-
-## 🔐 Poziomy Wagi
-
-| Poziom | Opis | Działanie |
-|--------|------|-----------|
-| **CRITICAL** | Krytyczne zagrożenia wymagające natychmiastowej akcji | Napraw ASAP |
-| **HIGH** | Poważne podatności | Napraw w ciągu tygodnia |
-| **MEDIUM** | Średnie zagrożenia | Zaplanuj naprawę |
-| **LOW** | Niskie zagrożenia | Rozważ naprawę |
-| **INFO** | Informacyjne / best practices | Dobra praktyka |
-
-## 📝 Przykłady
-
-W katalogu `examples/` znajdziesz przykładowy podatny kod:
-- `vulnerable_code.py` - Python/Flask z podatnościami
-- `vulnerable_code.js` - JavaScript/Node.js z podatnościami
-- `package.json` - Przykład z podatnymi zależnościami
-
-## 🤝 Wkład w Projekt
-
-Contributions są mile widziane! Aby dodać nowy skaner lub poprawić istniejący:
-
-1. Fork repozytorium
-2. Stwórz branch (`git checkout -b feature/nowy-skaner`)
-3. Commit zmian (`git commit -am 'Dodaj nowy skaner'`)
-4. Push do brancha (`git push origin feature/nowy-skaner`)
-5. Stwórz Pull Request
-
-## ⚠️ Ograniczenia
-
-- System wykrywa **potencjalne** podatności - wymaga weryfikacji
-- Nie zastępuje manualnego security review
-- Nie wykrywa błędów logiki biznesowej
-- Baza podatności wymaga aktualizacji
-
-## 📜 Licencja
-
-MIT License - zobacz [LICENSE](LICENSE) dla szczegółów.
-
-## 👤 Autor
-
-netcuter
-
-## 🙏 Podziękowania
-
-- OWASP za dokumentację Top 10
-- MITRE za bazę CWE
-- Społeczność open source za inspirację
-
 ---
 
-**Uwaga**: Ten system jest narzędziem pomocniczym. Zawsze przeprowadzaj profesjonalny security audit przed wdrożeniem aplikacji produkcyjnej.
+## Author
+
+**netcuter** — 12 years in web application security
+
+## License
+
+MIT — see [LICENSE](LICENSE)
+
+## Acknowledgments
+
+- OWASP for Top 10 and ASVS documentation
+- MITRE for the CWE database
+- OSV.dev and FIRST.org for CVE and EPSS data
+- The open source security community

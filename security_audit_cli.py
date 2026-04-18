@@ -7,6 +7,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from security_audit._version import __version__
 from security_audit.core import Config, AuditEngine
 from security_audit.scanners import (
     WebVulnerabilityScanner,
@@ -15,7 +16,8 @@ from security_audit.scanners import (
     ASVSScanner,
     MultiLanguageScanner,
     AdvancedPatternsScanner,
-    DataFlowScanner
+    DataFlowScanner,
+    MCPFileScanner,
 )
 from security_audit.reporters import (
     JSONReporter,
@@ -126,7 +128,7 @@ Examples:
     parser.add_argument(
         '--version',
         action='version',
-        version='Security Audit System v3.0.0 - AI-Powered Engine (AdvancedSecurity-Inspired) + Professional Level + ML'
+        version=f'Bastion Security Audit System v{__version__}'
     )
 
     args = parser.parse_args()
@@ -146,7 +148,7 @@ Examples:
         scanner_names = [s.strip() for s in args.scanners.split(',')]
         scanners_to_run = scanner_names
     else:
-        scanners_to_run = ['web', 'secrets', 'dependencies', 'asvs', 'multilang', 'advanced', 'dataflow']
+        scanners_to_run = ['web', 'secrets', 'dependencies', 'asvs', 'multilang', 'advanced', 'dataflow', 'mcp']
 
     if 'web' in scanners_to_run:
         web_scanner = WebVulnerabilityScanner(config.get_scanner_config('web_vulnerabilities'))
@@ -191,6 +193,12 @@ Examples:
         engine.register_scanner(dataflow_scanner)
         if args.verbose:
             print(f"[+] Registered: {dataflow_scanner.get_name()}")
+
+    if 'mcp' in scanners_to_run:
+        mcp_scanner = MCPFileScanner(config.get_scanner_config('mcp'))
+        engine.register_scanner(mcp_scanner)
+        if args.verbose:
+            print(f"[+] Registered: {mcp_scanner.get_name()}")
 
     # Validate path
     project_path = Path(args.path).resolve()

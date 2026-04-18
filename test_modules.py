@@ -566,7 +566,6 @@ def main():
 
     if passed == total:
         print("\n🎉 ALL TESTS PASSED! 🎉")
-        print(" Done!")
         return 0
     else:
         print(f"\n⚠️  {total - passed} test(s) failed")

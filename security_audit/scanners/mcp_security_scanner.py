@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-HexStrike MCP Security Scanner Module
-Skanuje MCP servers dla Tool Poisoning, Rug Pulls, Prompt Injection
-Integruje z istniejącym anonymization system!
-
-! Done!
+Bastion MCP Security Scanner Module
+Scans MCP servers for Tool Poisoning, Rug Pulls, and Prompt Injection.
+Integrates with the existing anonymization system.
 """
 
 import asyncio
@@ -400,9 +398,8 @@ def print_banner():
     """Print HexStrike MCP Scanner banner"""
     banner = """
 ╔═══════════════════════════════════════════════════════════════╗
-║     HexStrike MCP Security Scanner v1.0                       ║
+║     Bastion MCP Security Scanner v1.0                         ║
 ║     Tool Poisoning | Rug Pull | Prompt Injection Detection    ║
-║     ! Done!                         ║
 ╚═══════════════════════════════════════════════════════════════╝
 """
     print(banner)
@@ -502,7 +499,7 @@ async def main():
                 print(f"\n✅ {tool_name}: SAFE")
         
         print("\n" + "-" * 50)
-        print("Done! Scan complete.")
+        print("Scan complete.")
 
 
 if __name__ == "__main__":

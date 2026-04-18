@@ -48,3 +48,10 @@ test_report.*
 test_projects/
 test_v2*.json
 test_*.json
+
+# Bastion runtime data (tool pins, evidence, action ledger)
+.hexstrike/
+.cache/bastion/
+evidence/
+bastion_ledger.jsonl
+policy.yaml

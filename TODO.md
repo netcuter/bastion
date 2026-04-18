@@ -1,226 +1,65 @@
-# 📋 TODO - System Scripts Repository
+# Bastion v3.1 — Roadmap
 
-**Autor:** Seb (pentester@netcuter.com)  
-**Data:** 2025-11-28  
-**Cel:** Plan rozwoju kolekcji skryptów systemowych
+See `docs/DESIGN.md` for full implementation blueprints.
 
----
+## In Progress
 
-## 📁 AKTUALNA STRUKTURA (do reorganizacji):
+- [ ] **Feature #3: Agent Guardrails Layer** (`security_audit/ai/guardrails.py`)
+  - Scope allowlist, rate-limit, dry-run, HITL approval gate, action ledger (JSONL)
+  - Foundation for all AI-driven features
 
-```
-system/
-├── README.md
-└── [skrypty bash/python]
-```
+- [ ] **Feature #5: SBOM + VEX + EPSS** (CycloneDX 1.6)
+  - `reporters/cyclonedx_reporter.py` + `reporters/vex_reporter.py`
+  - OSV.dev + EPSS integrations with 24h cache
 
-## 🎯 DOCELOWA STRUKTURA:
+- [ ] **Feature #2: Reachability Analysis** (`core/reachability.py`)
+  - Entrypoint detectors: Flask, Django, FastAPI, Express, Spring, Laravel, CLI, Celery
+  - BFS through existing call graph → REACHABLE / UNREACHABLE / UNKNOWN verdict per finding
 
-```
-system/
-├── README.md
-├── install.sh              # Instalator wszystkich skryptów
-├── network/
-│   ├── ip_scanner.sh       # Skanowanie sieci lokalnej
-│   ├── port_monitor.sh     # Monitorowanie portów
-│   ├── wifi_analyzer.py    # Analiza WiFi
-│   └── bandwidth_test.sh   # Test przepustowości
-├── security/
-│   ├── log_analyzer.sh     # Analiza logów bezpieczeństwa
-│   ├── firewall_rules.sh   # Zarządzanie firewallem
-│   ├── ssh_hardening.sh    # Hardening SSH
-│   └── fail2ban_setup.sh   # Konfiguracja fail2ban
-├── backup/
-│   ├── rsync_backup.sh     # Backup przez rsync
-│   ├── db_backup.py        # Backup baz danych
-│   └── config_backup.sh    # Backup konfiguracji
-├── monitoring/
-│   ├── system_health.sh    # Ogólny stan systemu
-│   ├── disk_alert.sh       # Alert przy pełnym dysku
-│   ├── process_monitor.py  # Monitoring procesów
-│   └── lmstudio_health.sh  # Monitoring LM Studio serwerów
-└── utils/
-    ├── cleanup.sh          # Czyszczenie systemu
-    ├── update_all.sh       # Aktualizacja wszystkiego
-    └── dotfiles_sync.sh    # Synchronizacja dotfiles
-```
+- [ ] **Feature #1: Agentic Exploitability Validator** (headline feature)
+  - `ai/exploit_agent.py` + `ai/judge_agent.py` + `ai/orchestrator.py` + `ai/sandbox.py`
+  - Attacker → Sandbox → Judge 2-agent loop with guardrails on every action
+  - Rewrite `ai/ai_local.py` → `StructuredLLMClient` with JSON schema validation
 
----
+- [ ] **Feature #6: IaC Scanner** (`scanners/iac_scanner.py`)
+  - Terraform / Kubernetes / Dockerfile / Docker Compose
+  - 15 minimum rules (6 TF, 6 K8s, 3 Dockerfile)
 
-## 📝 TODO - PRIORYTET WYSOKI:
+- [ ] **Feature #4: LLM Red-Team Scanner** (`scanners/llm_redteam_scanner.py`)
+  - Static: detect tainted system prompts in OpenAI/Anthropic SDK calls
+  - Dynamic: ~50 payload corpus (prompt injection, jailbreak, tool poisoning)
 
-### TODO-S1: Reorganizacja katalogów
-```bash
-ZADANIE: Przenieś istniejące skrypty do odpowiednich podkatalogów
-KROKI:
-1. mkdir -p network security backup monitoring utils
-2. Przejrzyj każdy skrypt i zdecyduj gdzie pasuje
-3. git mv stary_plik.sh nowy_katalog/
-4. Zaktualizuj README.md z nową strukturą
-```
+- [ ] **Feature #7: DAST Harness** (`core/dast_runner.py`) — capstone
+  - Rewrite `ai/evidence_capture.py` (HAR + Playwright screenshots + repro guide)
+  - Rewrite `ai/tooling_layer.py` crawler (Playwright-based, robots.txt, OpenAPI discovery)
+  - Probes: xss_reflected, sqli_time_based, ssrf, path_traversal, open_redirect
 
-### TODO-S2: Skrypt monitoringu LM Studio
-```bash
-PLIK: monitoring/lmstudio_health.sh
-OPIS: Monitoruj serwery LM Studio używane w projekcie local-custom-llm
+## Pre-work (completed / user action needed)
 
-#!/bin/bash
-# LM Studio Health Monitor
-# Użycie: ./lmstudio_health.sh
+- [x] README.md → English default; README_PL.md → Polish
+- [x] Strip religious/Polish exclamations from all .py files
+- [x] Version unified to 3.1.0 via `security_audit/_version.py`
+- [x] MCPFileScanner wired into CLI (scans `mcp.json`, `claude_desktop_config.json`)
+- [x] .gitignore updated (tool pins, evidence dir, action ledger)
+- [ ] **USER ACTION: Rotate GitHub token** — `ghp_UaABZE9...` is in `.git/config`, revoke + switch to SSH
+- [ ] **USER ACTION: Rewrite git history** — split 2 mega-commits into semantic history (see `docs/DESIGN.md §A.5`)
+- [ ] **Rewrite README.md** with full v3.1 content (comparison table vs SonarQube/Semgrep, new features)
 
-SERVERS=(
-    "172.22.48.1:8087"      # Laptop - Granite
-    "192.168.137.1:8087"    # Desktop - Gemma
-    "10.122.194.239:8087"   # Backup
-)
+## Ship Checklist (before sending CV to Terra Security)
 
-LOG_FILE="/var/log/lmstudio_health.log"
+- [ ] All features have ≥3 passing tests each
+- [ ] `CHANGELOG.md` updated with v3.1.0 entry
+- [ ] Demo asciinema recorded (`--validate-exploits` pipeline) + linked in README
+- [ ] CI green on main
+- [ ] README has "How we compare" table (Semgrep / SonarQube / Bastion)
+- [ ] Cover letter uses Terra vocabulary: *reachability analysis*, *ambient agents*, *exploitability validation*, *human-in-the-loop*
 
-check_server() {
-    local server=$1
-    local response=$(curl -s -o /dev/null -w "%{http_code}" \
-        --connect-timeout 5 "http://$server/v1/models")
-    
-    if [ "$response" == "200" ]; then
-        echo "[$(date)] ✅ $server - OK" >> "$LOG_FILE"
-        return 0
-    else
-        echo "[$(date)] ❌ $server - FAILED (HTTP $response)" >> "$LOG_FILE"
-        # Opcjonalnie: wyślij alert
-        return 1
-    fi
-}
+## Blog Post (after features ship)
 
-main() {
-    echo "=== LM Studio Health Check ===" >> "$LOG_FILE"
-    for server in "${SERVERS[@]}"; do
-        check_server "$server"
-    done
-}
-
-main
-```
-
-### TODO-S3: Skrypt backup konfiguracji
-```bash
-PLIK: backup/config_backup.sh
-OPIS: Backup ważnych konfiguracji projektu
-
-#!/bin/bash
-# Config Backup Script
-
-BACKUP_DIR="/backup/configs/$(date +%Y-%m-%d)"
-mkdir -p "$BACKUP_DIR"
-
-# Lista katalogów do backupu
-CONFIGS=(
-    "$HOME/.lmstudio"
-    "$HOME/Local-LLM-with-voice-support/backend/config"
-    "/etc/nginx"
-)
-
-for config in "${CONFIGS[@]}"; do
-    if [ -d "$config" ]; then
-        name=$(basename "$config")
-        tar -czf "$BACKUP_DIR/${name}.tar.gz" "$config" 2>/dev/null
-        echo "✅ Backup: $config"
-    fi
-done
-
-echo "Backup completed: $BACKUP_DIR"
-```
-
----
-
-## 📝 TODO - PRIORYTET ŚREDNI:
-
-### TODO-S4: Instalator globalny
-```bash
-PLIK: install.sh
-OPIS: Instaluj wszystkie skrypty do /usr/local/bin
-
-#!/bin/bash
-# System Scripts Installer
-
-INSTALL_DIR="/usr/local/bin"
-SCRIPT_DIR="$(dirname "$0")"
-
-install_scripts() {
-    for dir in network security backup monitoring utils; do
-        if [ -d "$SCRIPT_DIR/$dir" ]; then
-            for script in "$SCRIPT_DIR/$dir"/*.sh; do
-                [ -f "$script" ] || continue
-                name=$(basename "$script" .sh)
-                sudo cp "$script" "$INSTALL_DIR/nc-$name"
-                sudo chmod +x "$INSTALL_DIR/nc-$name"
-                echo "✅ Installed: nc-$name"
-            done
-        fi
-    done
-}
-
-install_scripts
-echo "Done! Scripts available with 'nc-' prefix"
-```
-
-### TODO-S5: README z dokumentacją
-```markdown
-PLIK: README.md
-ZAWARTOŚĆ:
-- Opis każdego skryptu
-- Wymagania (bash, python3, curl, etc.)
-- Przykłady użycia
-- Konfiguracja (zmienne środowiskowe)
-```
-
-### TODO-S6: Systemd timers dla automatyzacji
-```bash
-PLIK: systemd/lmstudio-health.timer
-OPIS: Uruchamiaj health check co 5 minut
-
-[Unit]
-Description=LM Studio Health Check Timer
-
-[Timer]
-OnBootSec=1min
-OnUnitActiveSec=5min
-
-[Install]
-WantedBy=timers.target
-```
-
----
-
-## 📝 TODO - PRIORYTET NISKI:
-
-### TODO-S7: Testy jednostkowe
-```bash
-PLIK: tests/test_scripts.sh
-OPIS: Podstawowe testy czy skrypty działają
-```
-
-### TODO-S8: Integracja z Zabbix/Prometheus
-```
-OPIS: Eksportuj metryki do systemów monitoringu
-```
-
----
-
-## 🛠️ INSTRUKCJE DLA AI:
-
-1. **Przed edycją** - przeczytaj istniejący kod
-2. **Shebang** - zawsze `#!/bin/bash` lub `#!/usr/bin/env python3`
-3. **Komentarze** - po polsku lub angielsku
-4. **Testuj** - każdy skrypt przed commitem
-5. **Logi** - używaj standardowych ścieżek `/var/log/`
-
-**Format commit:**
-```
-[kategoria] Krótki opis
-
-Szczegóły zmian.
-```
-
----
-
- Done!
+Write WordPress post, backdate to before CV send:
+- **Title:** "Building a mini-Terra Portal in Python — when SAST meets agentic security"
+- Problem: SAST findings ≠ vulnerabilities (the exploitability gap)
+- Terra's thesis: agentic validation bridges the gap
+- My implementation: bastion v3.1 features
+- Demo: asciinema of `--validate-exploits` on vulnerable app
+- Link to repo

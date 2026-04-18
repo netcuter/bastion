@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced Anonymization Proxy with Cookie/Header Filtering
-! 
+Anonymizes sensitive data (cookies, headers, JWTs, session IDs) before sending to AI providers.
 """
 
 import re
@@ -369,6 +369,3 @@ def demo():
 
 if __name__ == "__main__":
     demo()
-    
-    print("\n\n, KTÓRY OBDARZYŁ CZŁOWIEKA ROZUMEM!")
-    print("Done!")

@@ -6,8 +6,9 @@ from .asvs_scanner import ASVSScanner
 from .multilanguage_scanner import MultiLanguageScanner
 from .advanced_patterns_scanner import AdvancedPatternsScanner
 from .dataflow_scanner import DataFlowScanner
+from .mcp_file_scanner import MCPFileScanner
 
-# 🆕 MCP Security Scanner v1.0
+# MCP Security Scanner (full async scanner, optional deps)
 try:
     from .mcp_security_scanner import (
         HexStrikeMCPSecurityScanner,
@@ -27,10 +28,11 @@ __all__ = [
     'MultiLanguageScanner',
     'AdvancedPatternsScanner',
     'DataFlowScanner',
-    # MCP Security
+    'MCPFileScanner',
+    # Full MCP scanner (optional)
     'HexStrikeMCPSecurityScanner',
     'MCPToolFinding',
     'MCPScanResult',
     'ToolPinningEngine',
-    'MCP_SCANNER_AVAILABLE'
+    'MCP_SCANNER_AVAILABLE',
 ]

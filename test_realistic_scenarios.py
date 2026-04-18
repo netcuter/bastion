@@ -738,7 +738,6 @@ def main():
 
     print("\n" + "="*80)
     print("  🎉 ALL REALISTIC TESTS COMPLETED!")
-    print("   Done!")
     print("="*80)
 
 

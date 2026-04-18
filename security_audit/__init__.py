@@ -1,8 +1,8 @@
 """
 Security Audit System for Web Applications
 """
-__version__ = "1.0.0"
-__author__ = "Security Audit Team"
+from ._version import __version__
+__author__ = "netcuter"
 
 from .core import AuditEngine, Config, Finding, Severity
 
